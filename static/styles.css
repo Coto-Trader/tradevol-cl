@@ -1,0 +1,845 @@
+/* ==========================================================================
+   OVML USD/CLP INSTITUTIONAL FX OPTIONS TERMINAL — GOOGLE DESIGN STITCH CSS
+   High-density dark financial terminal + adaptive Mobile On-The-Go experience
+   ========================================================================== */
+
+:root {
+  --bg-canvas: #070a0f;
+  --bg-panel: #0e131d;
+  --bg-panel-alt: #131a27;
+  --bg-elevated: #192233;
+  --bg-input: #0a0e17;
+  --ovml-amber: #f59e0b;
+  --ovml-amber-bright: #fbbf24;
+  --ovml-amber-cell: #d97706;
+  --ovml-tan: #b5a382;
+  --ovml-emerald: #10b981;
+  --ovml-crimson: #f43f5e;
+  --ovml-cyan: #38bdf8;
+  --ovml-indigo: #6366f1;
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --border-subtle: #1e293b;
+  --border-strong: #334155;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-canvas);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.4;
+  overflow-x: hidden;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-canvas);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--ovml-amber);
+}
+
+/* ==========================================================================
+   TOP TERMINAL COMMAND BAR (BLOOMBERG OVML + GOOGLE STITCH HEADER)
+   ========================================================================== */
+.top-command-bar {
+  background: linear-gradient(180deg, #111827 0%, #0b0f19 100%);
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 8px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.brand-cluster {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ovml-badge {
+  background: var(--ovml-amber);
+  color: #000;
+  font-family: var(--font-mono);
+  font-weight: 800;
+  font-size: 12px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+}
+
+.pair-ticker {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-strong);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-family: var(--font-mono);
+}
+
+.pair-ticker .pair-name {
+  color: var(--ovml-amber-bright);
+  font-weight: 700;
+}
+
+.pair-ticker .spot-live {
+  color: #fff;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.pair-ticker .source-tag {
+  color: var(--ovml-emerald);
+  font-size: 12px;
+}
+
+/* Main Navigation Tabs */
+.nav-tabs {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--bg-input);
+  padding: 3px;
+  border-radius: 8px;
+  border: 1px solid var(--border-subtle);
+}
+
+.nav-tab {
+  background: transparent;
+  color: var(--text-secondary);
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+}
+
+.nav-tab:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.nav-tab.active {
+  background: var(--bg-elevated);
+  color: var(--ovml-amber-bright);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+}
+
+.nav-tab .key-num {
+  color: var(--ovml-amber);
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+/* Action & Mode Switcher Right Cluster */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pov-toggle {
+  display: flex;
+  background: var(--bg-input);
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.pov-btn {
+  background: transparent;
+  color: var(--text-secondary);
+  border: none;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.pov-btn.active {
+  background: var(--ovml-amber);
+  color: #000;
+}
+
+.device-switch-btn {
+  background: rgba(56, 189, 248, 0.12);
+  color: var(--ovml-cyan);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.device-switch-btn:hover,
+.device-switch-btn.active {
+  background: var(--ovml-cyan);
+  color: #05080f;
+}
+
+/* ==========================================================================
+   BLOOMBERG OVML SUB-TOOLBAR (31 SOLVER, PRODUCTS, STRIPS, BOOK DEAL)
+   ========================================================================== */
+.ovml-subtoolbar {
+  background: #141b28;
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 6px 14px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.toolbar-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.ovml-btn {
+  background: #1e293b;
+  color: var(--text-primary);
+  border: 1px solid #334155;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.12s;
+}
+
+.ovml-btn:hover {
+  background: #283548;
+  border-color: var(--ovml-amber);
+}
+
+.ovml-btn.amber {
+  background: linear-gradient(180deg, #f59e0b 0%, #d97706 100%);
+  color: #000;
+  border-color: #fbbf24;
+  font-weight: 700;
+}
+
+.ovml-btn.amber:hover {
+  filter: brightness(1.08);
+}
+
+.ovml-btn.emerald {
+  background: linear-gradient(180deg, #10b981 0%, #059669 100%);
+  color: #03150e;
+  border-color: #34d399;
+  font-weight: 700;
+}
+
+.ovml-select {
+  background: var(--bg-input);
+  color: var(--ovml-amber-bright);
+  border: 1px solid var(--border-strong);
+  padding: 5px 9px;
+  border-radius: 5px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ovml-ticker-banner {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  background: #0a0f18;
+  border-left: 3px solid var(--ovml-amber);
+  padding: 4px 10px;
+  letter-spacing: 0.3px;
+}
+
+/* ==========================================================================
+   DESKTOP WORKSPACE GRID
+   ========================================================================== */
+.workspace-container {
+  padding: 12px 14px;
+  max-width: 1920px;
+  margin: 0 auto;
+}
+
+.tab-panel {
+  display: none;
+}
+
+.tab-panel.active {
+  display: block;
+}
+
+.pricer-layout-grid {
+  display: grid;
+  grid-template-columns: 7fr 5fr;
+  gap: 12px;
+  align-items: start;
+}
+
+.stitch-card {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+}
+
+.card-header {
+  background: var(--bg-panel-alt);
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card-title {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ==========================================================================
+   BLOOMBERG OVML MULTI-COLUMN MATRIX TABLE
+   ========================================================================== */
+.ovml-matrix-wrapper {
+  overflow-x: auto;
+}
+
+.ovml-matrix-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.ovml-matrix-table th,
+.ovml-matrix-table td {
+  padding: 5px 8px;
+  border-bottom: 1px solid #1a2232;
+  border-right: 1px solid #1a2232;
+  white-space: nowrap;
+}
+
+.ovml-matrix-table thead th {
+  background: #182030;
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-weight: 700;
+  text-align: left;
+}
+
+.ovml-matrix-table .row-label {
+  font-family: var(--font-sans);
+  color: #cbd5e1;
+  background: #0d121b;
+  font-weight: 600;
+  width: 135px;
+}
+
+.ovml-matrix-table .section-divider td {
+  background: #1c2536;
+  color: var(--ovml-amber-bright);
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 4px 8px;
+}
+
+/* Bloomberg Amber & Tan Editable Cells */
+.cell-strategy {
+  background: rgba(245, 158, 11, 0.14);
+  color: #fde68a;
+  font-weight: 700;
+}
+
+.cell-leg-amber {
+  background: rgba(217, 119, 6, 0.18);
+}
+
+.cell-leg-tan {
+  background: rgba(181, 163, 130, 0.12);
+}
+
+.matrix-input,
+.matrix-select {
+  background: #090d14;
+  color: #f8fafc;
+  border: 1px solid #334155;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  width: 100%;
+  max-width: 120px;
+}
+
+.matrix-input:focus,
+.matrix-select:focus {
+  outline: none;
+  border-color: var(--ovml-amber);
+  box-shadow: 0 0 0 1px var(--ovml-amber);
+}
+
+.matrix-input.strike-blue {
+  color: #60a5fa;
+  font-weight: 700;
+}
+
+.val-receive {
+  color: #34d399;
+  font-weight: 700;
+}
+
+.val-pay {
+  color: #fb7185;
+  font-weight: 700;
+}
+
+/* ==========================================================================
+   RIGHT COLUMN: BQNT HERO PREMIUM, DELTA HEDGE BANNER & SMILE/PAYOFF CHARTS
+   ========================================================================== */
+.right-analytics-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.bqnt-hero-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding: 12px;
+}
+
+.premium-pv-box {
+  background: linear-gradient(145deg, #131b2b 0%, #0b101b 100%);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-radius: 8px;
+  padding: 12px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.pv-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  letter-spacing: 0.8px;
+}
+
+.pv-clp-main {
+  font-family: var(--font-mono);
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--ovml-amber-bright);
+  margin: 4px 0;
+}
+
+.pv-usd-sub {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ovml-cyan);
+}
+
+.greeks-mini-box {
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.greek-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 3px 0;
+  border-bottom: 1px dashed #1e293b;
+  font-size: 12px;
+}
+
+.greek-row:last-child {
+  border-bottom: none;
+}
+
+.greek-name {
+  color: var(--text-secondary);
+}
+
+.greek-val {
+  font-family: var(--font-mono);
+  font-weight: 700;
+}
+
+/* Delta Hedge Instruction Banner */
+.hedge-instruction-card {
+  margin: 0 12px 12px 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.hedge-instruction-card.sell {
+  background: rgba(244, 63, 94, 0.1);
+  border-color: rgba(244, 63, 94, 0.4);
+}
+
+.hedge-badge {
+  padding: 4px 8px;
+  border-radius: 5px;
+  font-family: var(--font-mono);
+  font-weight: 800;
+  font-size: 12px;
+  background: var(--ovml-emerald);
+  color: #041f14;
+  white-space: nowrap;
+}
+
+.hedge-instruction-card.sell .hedge-badge {
+  background: var(--ovml-crimson);
+  color: #fff;
+}
+
+/* Charts */
+.chart-box {
+  padding: 10px 12px;
+}
+
+.chart-canvas {
+  width: 100%;
+  height: 205px;
+  background: #080c14;
+  border: 1px solid #1a2333;
+  border-radius: 6px;
+  display: block;
+}
+
+.pillar-strip {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.pillar-chip {
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: 5px;
+  padding: 4px 6px;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.pillar-chip .p-lbl {
+  display: block;
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+}
+
+/* ==========================================================================
+   VOLATILITY SURFACE TABLE (BLOOMBERG BGN 1D-4Y)
+   ========================================================================== */
+.vol-surface-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.vol-surface-table th {
+  background: #1a2234;
+  color: #e2e8f0;
+  padding: 7px 10px;
+  text-align: center;
+  border: 1px solid #293548;
+}
+
+.vol-surface-table td {
+  padding: 6px 10px;
+  text-align: center;
+  border: 1px solid #192231;
+  color: var(--ovml-amber-bright);
+  cursor: pointer;
+}
+
+.vol-surface-table tr:hover td {
+  background: rgba(245, 158, 11, 0.14);
+}
+
+.vol-surface-table td.tenor-col {
+  color: #f8fafc;
+  font-weight: 700;
+  background: #101725;
+}
+
+/* ==========================================================================
+   PORTFOLIO & COUNTERPARTIES MODULE
+   ========================================================================== */
+.kpi-strip {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.kpi-card {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 10px 14px;
+}
+
+.kpi-card .k-title {
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.kpi-card .k-val {
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: 800;
+  margin-top: 3px;
+}
+
+.portfolio-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.cartera-card {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: 9px;
+  padding: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.cartera-card:hover,
+.cartera-card.selected {
+  border-color: var(--ovml-amber);
+  background: #131c2c;
+}
+
+.progress-bar-bg {
+  width: 100%;
+  height: 6px;
+  background: #1e293b;
+  border-radius: 3px;
+  overflow: hidden;
+  margin: 6px 0;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981, #f59e0b);
+}
+
+/* ==========================================================================
+   MOBILE ON-THE-GO FRAME & RESPONSIVE VIEW
+   ========================================================================== */
+.mobile-simulator-shell {
+  max-width: 430px;
+  margin: 10px auto;
+  background: #0b101b;
+  border: 6px solid #263248;
+  border-radius: 34px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.75);
+}
+
+.mobile-statusbar {
+  background: #060911;
+  padding: 8px 18px;
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.mobile-body {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Modals */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(3, 6, 12, 0.8);
+  backdrop-filter: blur(4px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 300;
+}
+
+.modal-backdrop.open {
+  display: flex;
+}
+
+.modal-card {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-strong);
+  border-radius: 12px;
+  width: 94%;
+  max-width: 540px;
+  padding: 18px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.65);
+}
+
+@media (max-width: 1100px) {
+  .pricer-layout-grid {
+    grid-template-columns: 1fr;
+  }
+  .kpi-strip {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Native Full-Screen Mobile Layout for Smartphones */
+.mobile-bottom-nav {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  body {
+    padding-bottom: 68px;
+  }
+  .top-command-bar {
+    padding: 8px 10px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  #hdr-strategy-desc,
+  .nav-tabs,
+  .device-switch-btn {
+    display: none !important;
+  }
+  .ovml-subtoolbar {
+    padding: 6px 10px;
+    overflow-x: auto;
+  }
+  .workspace-container {
+    padding: 8px;
+  }
+  /* Remove phone bezel on actual mobile devices so it looks 100% native */
+  .mobile-simulator-shell {
+    max-width: 100%;
+    margin: 0;
+    border: none;
+    border-radius: 14px;
+    box-shadow: none;
+  }
+  .mobile-statusbar {
+    display: none;
+  }
+  .mobile-body {
+    padding: 6px 2px;
+  }
+  .kpi-strip {
+    grid-template-columns: 1fr 1fr;
+  }
+  #tab-portfolio > div[style*="grid-template-columns: 6fr 6fr"] {
+    grid-template-columns: 1fr !important;
+  }
+  .bqnt-hero-grid {
+    grid-template-columns: 1fr;
+  }
+  /* Fixed Bottom App Bar for Mobile */
+  .mobile-bottom-nav {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: rgba(11, 15, 25, 0.96);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid #263248;
+    z-index: 250;
+  }
+  .mob-nav-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .mob-nav-btn.active {
+    color: var(--ovml-amber-bright);
+    background: rgba(245, 158, 11, 0.08);
+  }
+}
+

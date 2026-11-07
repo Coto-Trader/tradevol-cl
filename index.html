@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Coto-TradeAI USD/CLP — Institutional FX Options Terminal &amp; Mobile Quoter</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="static/styles.css" />
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+
+  <!-- ====================================================================
+       1. TOP INSTITUTIONAL TERMINAL COMMAND BAR (Coto-TradeAI)
+       ==================================================================== -->
+  <header class="top-command-bar">
+    <div class="brand-cluster">
+      <span class="ovml-badge">Coto-TradeAI &lt;GO&gt;</span>
+      <div class="pair-ticker">
+        <span class="pair-name">USDCLP Curncy</span>
+        <span class="spot-live" id="hdr-spot-val">978.55</span>
+        <span class="source-tag">● BGN NY 10:00</span>
+      </div>
+      <span style="color: var(--text-secondary); font-size: 12px;" id="hdr-strategy-desc">
+        Coto-TradeAI Option Valuation FX — Mesa de Dinero Local
+      </span>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <nav class="nav-tabs" role="tablist">
+      <button class="nav-tab active" data-tab="tab-pricer" onclick="switchTab('tab-pricer')">
+        <span class="key-num">51)</span> Coto-TradeAI Pricer
+      </button>
+      <button class="nav-tab" data-tab="tab-surface" onclick="switchTab('tab-surface')">
+        <span class="key-num">90)</span> Superficie Volatilidad (1D-4Y)
+      </button>
+      <button class="nav-tab" data-tab="tab-portfolio" onclick="switchTab('tab-portfolio')">
+        <span class="key-num">80)</span> 🗂️ Mantenedor de Tickets &amp; Carteras
+      </button>
+      <button class="nav-tab" data-tab="tab-mobile" onclick="switchTab('tab-mobile')">
+        <span class="key-num">📱</span> Mobile Quoter On-the-Go
+      </button>
+    </nav>
+
+    <!-- POV Switch & Quick Actions -->
+    <div class="header-actions">
+      <div class="pov-toggle" title="Cambiar Perspectiva de Griegas y Cobertura">
+        <button class="pov-btn active" id="pov-mesa-btn" onclick="setPOV('mesa')">POV Mesa</button>
+        <button class="pov-btn" id="pov-cliente-btn" onclick="setPOV('cliente')">POV Cliente</button>
+      </div>
+      <button class="device-switch-btn" onclick="switchTab('tab-mobile')">
+        📱 Vista App Móvil
+      </button>
+    </div>
+  </header>
+
+  <!-- ====================================================================
+       2. Coto-TradeAI SUB-TOOLBAR (PRODUCTS, SOLVER, STRIPS, BOOKING)
+       ==================================================================== -->
+  <section class="ovml-subtoolbar">
+    <div class="toolbar-group">
+      <label style="color: var(--text-secondary); font-weight: 600;">Products ▾</label>
+      <select id="preset-selector" class="ovml-select" onchange="loadPresetStrategy(this.value)">
+        <option value="rr_collar_export">Risk Reversal 1 (Collar Exportador BGN)</option>
+        <option value="zcc_import">Zero-Cost Collar (Importador Costo Cero)</option>
+        <option value="vanilla_call">Vanilla Call (Outright)</option>
+        <option value="vanilla_put">Vanilla Put (Outright)</option>
+        <option value="straddle">Straddle ATM (Cono de Volatilidad)</option>
+        <option value="strangle">Strangle OTM (Cuna de Volatilidad)</option>
+        <option value="butterfly">Butterfly (Mariposa 1x2x1)</option>
+        <option value="condor">Condor (Rango 4 Piernas)</option>
+        <option value="participating_fwd">Participating Forward (50%)</option>
+        <option value="seagull_export">Seagull Exportador (3 Piernas)</option>
+        <option value="ratio_straddle">Ratio Call Spread (1x2)</option>
+        <option value="fwd_plus_option">Mixta: FX Forward + Opción</option>
+      </select>
+
+      <button class="ovml-btn amber" onclick="solveZeroCost(0)" title="Newton-Raphson Goal Seek: Resuelve el Strike para lograr Prima Neta = 0">
+        31) Solver Prima = 0 (Leg 1)
+      </button>
+      <button class="ovml-btn" onclick="solveZeroCost(1)" title="Newton-Raphson Goal Seek sobre Leg 2">
+        31) Solver Prima = 0 (Leg 2)
+      </button>
+      <button class="ovml-btn" onclick="openStripModal()">
+        📅 Generate Strips (Tiras Mensuales)
+      </button>
+      <button class="ovml-btn" onclick="addOptionLeg()">
+        + Agregar Pierna (Leg)
+      </button>
+    </div>
+
+    <div class="toolbar-group">
+      <div class="ovml-ticker-banner" id="ovml-ticker-banner">
+        Coto-TradeAI USDCLP RR EU 1023.37C,940.00P Fix:2027-02-10 N1M
+      </div>
+      <button class="ovml-btn amber" onclick="switchTab('tab-portfolio')" title="Ir al Mantenedor de Tickets para asignar operaciones pendientes">
+        🗂️ Mantenedor de Tickets
+      </button>
+      <button class="ovml-btn emerald" onclick="openBookDealModal()">
+        34) Guardar Ticket (Sin Asignar / Cliente)
+      </button>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       3. MAIN WORKSPACE CONTAINER
+       ==================================================================== -->
+  <main class="workspace-container">
+
+    <!-- ==================================================================
+         TAB 1: 51) Coto-TradeAI PRICER & MULTI-LEG STRATEGY BUILDER
+         ================================================================== -->
+    <section id="tab-pricer" class="tab-panel active">
+      <div class="pricer-layout-grid">
+
+        <!-- LEFT COLUMN: MARKET DATA + Coto-TradeAI MULTI-COLUMN MATRIX -->
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+
+          <!-- Market Data Live Bar -->
+          <div class="stitch-card">
+            <div class="card-header">
+              <span class="card-title">⚡ Coto-TradeAI Market Data &amp; Plazo Global (Fix / Sett)</span>
+              <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px;">
+                <span style="color: var(--text-secondary); font-size: 12px;">Plazo Tenor:</span>
+                <select id="quick-tenor-select" class="matrix-select" style="width: 92px;" onchange="applySurfaceTenor(this.value)">
+                  <option value="1">1D (1d)</option>
+                  <option value="7">1W (7d)</option>
+                  <option value="14">2W (14d)</option>
+                  <option value="21">3W (21d)</option>
+                  <option value="32">1M (32d)</option>
+                  <option value="61">2M (61d)</option>
+                  <option value="96" selected>3M (96d)</option>
+                  <option value="124">4M (124d)</option>
+                  <option value="154">5M (154d)</option>
+                  <option value="184">6M (184d)</option>
+                  <option value="275">9M (275d)</option>
+                  <option value="365">1Y (365d)</option>
+                  <option value="548">18M (548d)</option>
+                  <option value="730">2Y (730d)</option>
+                </select>
+                <span style="color: var(--text-secondary); font-size: 12px;">Cotizar Precio en:</span>
+                <select id="global-price-unit" class="matrix-select" style="width: 135px; color: var(--ovml-amber-bright);" onchange="setPriceUnit(this.value)">
+                  <option value="clp_pips" selected>CLP pips (CLP/USD)</option>
+                  <option value="usd_pips">USD pips (bps USD)</option>
+                  <option value="usd_pct">% Prima USD</option>
+                  <option value="clp_pct">% Prima CLP (K)</option>
+                </select>
+                <select id="global-model-select" class="matrix-select" style="width: 140px; color: var(--ovml-emerald);" onchange="setGlobalModel(this.value)">
+                  <option value="Vanna-Volga" selected>Modelo: Vanna-Volga</option>
+                  <option value="Black-Scholes">Modelo: Black-Scholes</option>
+                </select>
+              </div>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; padding: 10px 12px; background: #0b0f18;">
+              <div>
+                <label style="color: var(--text-secondary); font-size: 12px; display: block;">Spot USD/CLP</label>
+                <input id="mkt-spot" type="number" step="0.05" value="978.55" class="matrix-input" style="color: var(--ovml-amber-bright); font-size: 13px;" oninput="repriceCurrentStrategy()" />
+              </div>
+              <div>
+                <label style="color: var(--text-secondary); font-size: 12px; display: block;">ATM Vol (%)</label>
+                <input id="mkt-atm" type="number" step="0.05" value="12.738" class="matrix-input" oninput="repriceCurrentStrategy()" />
+              </div>
+              <div>
+                <label style="color: var(--text-secondary); font-size: 12px; display: block;">25D RR Skew (%)</label>
+                <input id="mkt-rr25" type="number" step="0.05" value="1.698" class="matrix-input" oninput="repriceCurrentStrategy()" />
+              </div>
+              <div>
+                <label style="color: var(--text-secondary); font-size: 12px; display: block;">25D BF Smile (%)</label>
+                <input id="mkt-bf25" type="number" step="0.05" value="0.313" class="matrix-input" oninput="repriceCurrentStrategy()" />
+              </div>
+              <div>
+                <label style="color: var(--text-secondary); font-size: 12px; display: block;">Tasa CLP Depo (%)</label>
+                <input id="mkt-rd" type="number" step="0.05" value="3.666" class="matrix-input" oninput="repriceCurrentStrategy()" />
+              </div>
+              <div>
+                <label style="color: var(--text-secondary); font-size: 12px; display: block;">Tasa USD SOFR (%)</label>
+                <input id="mkt-rf" type="number" step="0.05" value="4.063" class="matrix-input" oninput="repriceCurrentStrategy()" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Coto-TradeAI Multi-Column Strategy Matrix -->
+          <div class="stitch-card">
+            <div class="card-header">
+              <span class="card-title">📊 Matriz de Estructuración Multi-Pierna (Coto-TradeAI Grid)</span>
+              <span style="font-family: var(--font-mono); font-size: 12px; color: var(--ovml-amber);" id="matrix-legs-badge">
+                2 Piernas Activas
+              </span>
+            </div>
+            <div class="ovml-matrix-wrapper">
+              <table class="ovml-matrix-table" id="ovml-grid-table">
+                <!-- Dynamically populated by app.js -->
+              </table>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- RIGHT COLUMN: HERO + DELTA HEDGE ORDER + SMILE & PAYOFF CHARTS -->
+        <div class="right-analytics-stack">
+
+          <!-- Option Premium & Greeks Hero Card -->
+          <div class="stitch-card">
+            <div class="card-header">
+              <span class="card-title">💎 Valorización Coto-TradeAI &amp; Griegas (<span id="active-pov-label">POV MESA LOCAL</span>)</span>
+              <span style="font-family: var(--font-mono); font-size: 12px; color: var(--ovml-emerald);" id="hero-pips-tag">
+                0.759 CLP pips P | 0.0776% USD
+              </span>
+            </div>
+
+            <div class="bqnt-hero-grid">
+              <div class="premium-pv-box">
+                <div style="display: flex; justify-content: center; gap: 6px; margin-bottom: 4px;">
+                  <span class="pv-label" id="hero-unit-pill" style="background: rgba(245,158,11,0.15); color: var(--ovml-amber-bright); padding: 2px 8px; border-radius: 4px;">
+                    PRIMA NETA (CLP / USD / %)
+                  </span>
+                </div>
+                <div class="pv-clp-main" id="hero-prem-clp">CLP 758,558 P</div>
+                <div class="pv-usd-sub" id="hero-prem-usd">USD 775.19 P (7.75 USD pips | 0.0775% Prima)</div>
+                <div style="margin-top: 6px; font-family: var(--font-mono); font-size: 12px; color: var(--text-secondary);" id="hero-fix-sett-line">
+                  Plazo: 3M (96d) · Fix: 2027-02-10 · Sett: 2027-02-12
+                </div>
+              </div>
+
+              <div class="greeks-mini-box">
+                <div class="greek-row">
+                  <span class="greek-name">Delta (Spot %)</span>
+                  <span class="greek-val" id="hero-delta-pct" style="color: var(--ovml-amber-bright);">+53.7747%</span>
+                </div>
+                <div class="greek-row">
+                  <span class="greek-name">Delta Hedge (USD)</span>
+                  <span class="greek-val" id="hero-hedge-usd" style="color: var(--ovml-emerald);">-537,747 USD</span>
+                </div>
+                <div class="greek-row">
+                  <span class="greek-name">Gamma (1% Spot USD)</span>
+                  <span class="greek-val" id="hero-gamma-usd">-1,426 USD</span>
+                </div>
+                <div class="greek-row">
+                  <span class="greek-name">Vega (1% Vol CLP)</span>
+                  <span class="greek-val" id="hero-vega-clp">-11,705 CLP</span>
+                </div>
+                <div class="greek-row">
+                  <span class="greek-name">Theta (1 Día CLP)</span>
+                  <span class="greek-val" id="hero-theta-clp">+3,763 CLP</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Spot Delta Hedge Execution Order Banner -->
+            <div class="hedge-instruction-card" id="hedge-banner-card">
+              <div>
+                <div style="font-size: 12px; font-weight: 800; color: var(--ovml-emerald); letter-spacing: 0.4px;" id="hedge-banner-title">
+                  ORDEN DE COBERTURA SPOT (DELTA HEDGE MESA)
+                </div>
+                <div style="font-family: var(--font-mono); font-size: 12px; color: var(--text-primary); margin-top: 2px;" id="hedge-banner-text">
+                  VENDER USD 537,747.32 en Spot @ 978.55 CLP para neutralizar Delta.
+                </div>
+              </div>
+              <span class="hedge-badge" id="hedge-action-pill">VENDER SPOT</span>
+            </div>
+          </div>
+
+          <!-- Chart 1: Vanna-Volga Implied Volatility Smile Curve -->
+          <div class="stitch-card">
+            <div class="card-header">
+              <span class="card-title">📈 Implied Volatility vs. Strike (Vanna-Volga Smile Curve)</span>
+              <span style="font-family: var(--font-mono); font-size: 12px; color: var(--ovml-cyan);" id="smile-fwd-label">
+                Fwd: 977.53 CLP
+              </span>
+            </div>
+            <div class="chart-box">
+              <canvas id="smile-canvas" width="640" height="210" class="chart-canvas"></canvas>
+              <div class="pillar-strip">
+                <div class="pillar-chip"><span class="p-lbl">10D Put</span><span id="pil-10p">12.14%</span></div>
+                <div class="pillar-chip"><span class="p-lbl">25D Put</span><span id="pil-25p">12.20%</span></div>
+                <div class="pillar-chip" style="border-color: var(--ovml-amber);"><span class="p-lbl">ATM DNS</span><span id="pil-atm" style="color: var(--ovml-amber-bright);">12.74%</span></div>
+                <div class="pillar-chip"><span class="p-lbl">25D Call</span><span id="pil-25c">13.90%</span></div>
+                <div class="pillar-chip"><span class="p-lbl">10D Call</span><span id="pil-10c">15.28%</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chart 2: Multi-Leg Payoff Profile at Expiry -->
+          <div class="stitch-card">
+            <div class="card-header">
+              <span class="card-title">🎯 Perfil de Payoff en Fecha Fix (P&amp;L Neto CLP vs Spot al Fix)</span>
+              <span style="font-size: 12px; color: var(--text-secondary);">
+                <span style="color: #38bdf8;">━ POV Cliente</span> &nbsp;|&nbsp; <span style="color: #f59e0b;">┅ POV Mesa</span>
+              </span>
+            </div>
+            <div class="chart-box">
+              <canvas id="payoff-canvas" width="640" height="195" class="chart-canvas"></canvas>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================================================================
+         TAB 2: 90) SUPERFICIE DE VOLATILIDAD (1D TO 4Y)
+         ================================================================== -->
+    <section id="tab-surface" class="tab-panel">
+      <div class="stitch-card">
+        <div class="card-header">
+          <div>
+            <span class="card-title">🌐 USDCLP Curncy — Superficie de Volatilidad Coto-TradeAI (BGN NY 10:00)</span>
+            <p style="color: var(--text-secondary); font-size: 12px; margin-top: 2px;">
+              Haz clic en cualquier fila (Tenor 1D a 4Y) para sincronizar automáticamente Plazo, Fechas Fix/Sett, ATM, 25D RR, 25D BF y Tasas en Coto-TradeAI.
+            </p>
+          </div>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <span style="padding: 4px 10px; background: rgba(245, 158, 11, 0.15); border: 1px solid var(--ovml-amber); border-radius: 5px; font-family: var(--font-mono); font-size: 12px; color: var(--ovml-amber-bright);">
+              Spot Ref: 978.55 CLP | Format: RR/BF Bid/Ask &amp; Mid
+            </span>
+          </div>
+        </div>
+        <div style="overflow-x: auto; padding: 12px;">
+          <table class="vol-surface-table" id="full-vol-surface-table">
+            <thead>
+              <tr>
+                <th>Tenor</th>
+                <th>Días</th>
+                <th>ATM Bid / Ask</th>
+                <th>ATM Mid</th>
+                <th>25D RR Bid / Ask</th>
+                <th>25D RR Mid</th>
+                <th>25D BF Bid / Ask</th>
+                <th>25D BF Mid</th>
+                <th>10D RR Bid / Ask</th>
+                <th>10D BF Bid / Ask</th>
+                <th>USD SOFR</th>
+                <th>CLP Depo</th>
+                <th>Acción</th>
+              </tr>
+            </thead>
+            <tbody id="vol-surface-tbody">
+              <!-- Populated by app.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================================================================
+         TAB 3: 80) MANTENEDOR DE TICKETS, SEGMENTOS Y CLIENTES (MODO TEST PROTEGIDO)
+         ================================================================== -->
+    <section id="tab-portfolio" class="tab-panel">
+
+      <!-- Desk Consolidated KPIs -->
+      <div class="kpi-strip">
+        <div class="kpi-card">
+          <div class="k-title">NOCIONAL VIVO TOTAL MESA</div>
+          <div class="k-val" style="color: var(--ovml-amber-bright);" id="pf-kpi-notional">USD 4,750,000</div>
+        </div>
+        <div class="kpi-card">
+          <div class="k-title">TICKETS SIN ASIGNAR / TOTAL</div>
+          <div class="k-val" style="color: var(--ovml-amber);" id="pf-kpi-unassigned">5 Sin Asignar / 5 Total</div>
+        </div>
+        <div class="kpi-card">
+          <div class="k-title">CLIENTES &amp; SEGMENTOS ACTIVOS</div>
+          <div class="k-val" style="color: var(--ovml-cyan);" id="pf-kpi-clients">0 Clientes (5 Segmentos)</div>
+        </div>
+        <div class="kpi-card">
+          <div class="k-title">DELTA HEDGE CONSOLIDADO MESA</div>
+          <div class="k-val" style="color: var(--ovml-emerald);" id="pf-kpi-hedge">+312,450 USD</div>
+        </div>
+        <div class="kpi-card">
+          <div class="k-title">FLUJO PRIMA NETA ACUMULADA</div>
+          <div class="k-val" style="color: var(--ovml-emerald);" id="pf-kpi-prem">CLP 1,840,000</div>
+        </div>
+      </div>
+
+      <!-- 1. TOP TICKET MAINTAINER (MANTENEDOR DE TICKETS ARRIBA) -->
+      <div class="stitch-card" style="margin-bottom: 14px; border: 1px solid rgba(245, 158, 11, 0.45);">
+        <div class="card-header" style="background: linear-gradient(90deg, rgba(245,158,11,0.14) 0%, rgba(15,23,42,0.95) 100%);">
+          <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+            <span class="card-title" style="font-size: 14px; color: var(--ovml-amber-bright);">
+              🗂️ MANTENEDOR DE TICKETS Coto-TradeAI (Operaciones Sin Asignar &amp; Asignación Posterior)
+            </span>
+            <span style="font-family: var(--font-mono); font-size: 12px; padding: 2px 8px; border-radius: 4px; background: rgba(16,185,129,0.15); color: var(--ovml-emerald);" id="blotter-count-badge">
+              5 Tickets
+            </span>
+          </div>
+          <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+            <button class="ovml-btn" onclick="filterPortfolio('ALL')" id="btn-filter-all">Ver Todos los Segmentos</button>
+            <button class="ovml-btn amber" onclick="openNewClientModal()">+ Crear Cliente para Asignar</button>
+            <button class="ovml-btn emerald" onclick="switchTab('tab-pricer')">+ Nueva Operación en Pricer</button>
+          </div>
+        </div>
+        <div style="max-height: 360px; overflow-y: auto;">
+          <table class="ovml-matrix-table">
+            <thead>
+              <tr>
+                <th>Ticket ID</th>
+                <th>Estado / Asignar Cliente Corporativo</th>
+                <th>Segmento / Cartera</th>
+                <th>Estrategia &amp; Ticker Coto-TradeAI</th>
+                <th>Nocional USD</th>
+                <th>Prima Neta (CLP / USD)</th>
+                <th>Delta Hedge Mesa</th>
+                <th>Acciones Ticket</th>
+              </tr>
+            </thead>
+            <tbody id="deals-blotter-tbody">
+              <!-- Populated by app.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 2. ACTION BAR FOR SEGMENTS (CARTERAS) & CLIENTS -->
+      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 10px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-weight: 700; color: var(--ovml-amber-bright); font-size: 13px;">
+            📂 Segmentos &amp; Carteras Sectoriales (Clic para filtrar Tickets; 🗑️ para eliminar cartera)
+          </span>
+        </div>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <button class="ovml-btn" onclick="openNewCarteraModal()">+ Nuevo Segmento / Cartera</button>
+          <button class="ovml-btn amber" onclick="openNewClientModal()">+ Nuevo Cliente / Contraparte</button>
+          <button class="ovml-btn" style="border-color: var(--ovml-crimson); color: #fda4af;" onclick="confirmDeleteAllClients()" title="Elimina todos los clientes para proteger confidencialidad y deja las operaciones Sin Asignar">
+            🗑️ Vaciar Clientes (Modo Test Protegido)
+          </button>
+        </div>
+      </div>
+
+      <!-- Sector Portfolios Grid -->
+      <div class="portfolio-cards-grid" id="portfolios-grid">
+        <!-- Populated by app.js -->
+      </div>
+
+      <!-- 3. COUNTERPARTIES & CREDIT LINES TABLE -->
+      <div class="stitch-card">
+        <div class="card-header">
+          <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+            <span class="card-title">🏢 Mantenedor de Clientes &amp; Contrapartes (0 Clientes Reales Expuestos por Defecto)</span>
+            <span style="font-size: 12px; color: var(--text-secondary);">
+              Al eliminar un cliente, sus tickets quedan automáticamente como <strong>⚠️ SIN ASIGNAR</strong> manteniendo su Segmento.
+            </span>
+          </div>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <input id="cp-search-input" type="text" placeholder="Buscar cliente o RUT..." class="matrix-input" style="max-width: 200px;" oninput="renderPortfolioTables()" />
+            <button class="ovml-btn amber" onclick="openNewClientModal()">+ Agregar Cliente</button>
+          </div>
+        </div>
+        <div style="max-height: 360px; overflow-y: auto;">
+          <table class="ovml-matrix-table">
+            <thead>
+              <tr>
+                <th>Cliente / Contraparte</th>
+                <th>Segmento / Cartera</th>
+                <th>Perfil Flujo</th>
+                <th>Línea USD</th>
+                <th>Nocional Vivo</th>
+                <th>Uso %</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="counterparties-tbody">
+              <!-- Populated by app.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ==================================================================
+         TAB 4: 📱 MOBILE QUOTER ON-THE-GO (Coto-TradeAI MOBILE)
+         ================================================================== -->
+    <section id="tab-mobile" class="tab-panel">
+      <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 28px; align-items: flex-start; padding: 8px 0;">
+
+        <!-- Interactive Smartphone Simulator / Fullscreen Mobile View -->
+        <div class="mobile-simulator-shell">
+          <div class="mobile-statusbar">
+            <span>09:41 ● Coto-TradeAI Mobile</span>
+            <span>5G 100% 🔋</span>
+          </div>
+
+          <div class="mobile-body">
+            <!-- Mobile Header -->
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <span style="font-size: 12px; color: var(--ovml-amber); font-weight: 700;">COTO-TRADEAI ON-THE-GO</span>
+                <h3 style="font-size: 16px; font-weight: 800; color: #fff;">Cotizador Rápido USD/CLP</h3>
+              </div>
+              <div style="text-align: right; font-family: var(--font-mono);">
+                <span style="font-size: 12px; color: var(--text-secondary); display: block;">SPOT BGN</span>
+                <span style="font-size: 16px; font-weight: 800; color: var(--ovml-amber-bright);" id="mob-spot-lbl">978.55</span>
+              </div>
+            </div>
+
+            <!-- Client Selector Card -->
+            <div style="background: #131b2b; border: 1px solid #26334d; border-radius: 12px; padding: 10px 12px;">
+              <label style="font-size: 12px; color: var(--text-secondary); display: block; margin-bottom: 4px;">Cliente Corporativo / Cartera</label>
+              <select id="mob-client-select" class="ovml-select" style="width: 100%; padding: 7px;" onchange="syncMobileClient()">
+                <!-- Populated by app.js -->
+              </select>
+              <div style="display: flex; justify-content: space-between; margin-top: 6px; font-size: 12px; font-family: var(--font-mono);">
+                <span style="color: var(--text-secondary);" id="mob-client-sector">Cartera Navieras</span>
+                <span style="color: var(--ovml-emerald);" id="mob-client-line">Línea Disp: USD 7.0M</span>
+              </div>
+            </div>
+
+            <!-- Quick Strategy Pills -->
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;">
+              <button class="ovml-btn amber" style="justify-content: center;" onclick="loadPresetStrategy('rr_collar_export')">Collar Exp</button>
+              <button class="ovml-btn" style="justify-content: center;" onclick="loadPresetStrategy('zcc_import')">ZCC Imp</button>
+              <button class="ovml-btn" style="justify-content: center;" onclick="loadPresetStrategy('vanilla_call')">Call Simple</button>
+            </div>
+
+            <!-- Mobile Ticket Controls (Strikes, Notional, Plazo, Fix & Sett, Price Unit) -->
+            <div style="background: #111827; border: 1px solid #1f2937; border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 12px; font-weight: 700; color: var(--ovml-cyan);" id="mob-strat-name">Risk Reversal 1</span>
+                <button class="ovml-btn amber" style="padding: 3px 8px;" onclick="solveZeroCost(0)">⚡ Costo Cero</button>
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                <div>
+                  <label style="font-size: 12px; color: var(--text-secondary);">Strike Leg 1 (Call)</label>
+                  <input id="mob-k1" type="number" step="0.5" value="1023.37" class="matrix-input" style="max-width: none; padding: 6px;" oninput="updateFromMobile()" />
+                </div>
+                <div>
+                  <label style="font-size: 12px; color: var(--text-secondary);">Strike Leg 2 (Put)</label>
+                  <input id="mob-k2" type="number" step="0.5" value="940.00" class="matrix-input" style="max-width: none; padding: 6px;" oninput="updateFromMobile()" />
+                </div>
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                <div>
+                  <label style="font-size: 12px; color: var(--text-secondary);">Nocional (USD)</label>
+                  <input id="mob-notional" type="number" step="100000" value="1000000" class="matrix-input" style="max-width: none; padding: 6px;" oninput="updateFromMobile()" />
+                </div>
+                <div>
+                  <label style="font-size: 12px; color: var(--text-secondary);">Plazo (Tenor / Días)</label>
+                  <div style="display: flex; gap: 4px;">
+                    <select id="mob-tenor" class="matrix-select" style="padding: 6px;" onchange="applySurfaceTenor(this.value)">
+                      <option value="7">1W</option>
+                      <option value="32">1M</option>
+                      <option value="61">2M</option>
+                      <option value="96" selected>3M</option>
+                      <option value="184">6M</option>
+                      <option value="365">1Y</option>
+                    </select>
+                    <input id="mob-days" type="number" step="1" value="96" class="matrix-input" style="max-width: 68px; padding: 6px;" oninput="updateMobileDays(this.value)" />
+                  </div>
+                </div>
+              </div>
+              <!-- Fix & Sett Row on Mobile -->
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                <div>
+                  <label style="font-size: 12px; color: var(--ovml-amber-bright); font-weight: 600;">Fix (Fixing Date)</label>
+                  <input id="mob-fix-date" type="date" value="2027-02-10" class="matrix-input" style="max-width: none; padding: 5px;" onchange="updateMobileFixDate(this.value)" />
+                </div>
+                <div>
+                  <label style="font-size: 12px; color: var(--ovml-cyan); font-weight: 600;">Sett (Settlement)</label>
+                  <input id="mob-sett-date" type="date" value="2027-02-12" class="matrix-input" style="max-width: none; padding: 5px;" onchange="updateMobileSettDate(this.value)" />
+                </div>
+              </div>
+              <!-- Price Unit Selector on Mobile -->
+              <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 4px; border-top: 1px dashed #1e293b;">
+                <span style="font-size: 12px; color: var(--text-secondary);">Unidad de Precio / Prima:</span>
+                <select id="mob-price-unit" class="matrix-select" style="max-width: 165px; color: var(--ovml-amber-bright);" onchange="setPriceUnit(this.value)">
+                  <option value="clp_pips" selected>CLP pips (CLP/USD)</option>
+                  <option value="usd_pips">USD pips (bps USD)</option>
+                  <option value="usd_pct">% de Prima (USD)</option>
+                  <option value="clp_pct">% de Prima (CLP)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Mobile Hero Result -->
+            <div style="background: linear-gradient(135deg, #172236 0%, #0d1422 100%); border: 1px solid var(--ovml-amber); border-radius: 12px; padding: 12px; text-align: center;">
+              <span style="font-size: 12px; color: var(--text-secondary); font-weight: 700;" id="mob-hero-unit-lbl">PRIMA NETA DE COTIZACIÓN</span>
+              <div style="font-family: var(--font-mono); font-size: 20px; font-weight: 800; color: var(--ovml-amber-bright); margin: 3px 0;" id="mob-prem-clp">
+                CLP 758,558 P
+              </div>
+              <div style="font-family: var(--font-mono); font-size: 12px; color: var(--ovml-cyan); margin-bottom: 4px;" id="mob-prem-multi">
+                USD 775 P · 0.759 CLP pips · 7.75 USD pips · 0.078% Prima
+              </div>
+              <div style="font-family: var(--font-mono); font-size: 12px; color: var(--ovml-emerald);" id="mob-hedge-line">
+                Delta Hedge Mesa: VENDER USD 537,747 Spot
+              </div>
+            </div>
+
+            <!-- Mobile Actions -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+              <button class="ovml-btn emerald" style="justify-content: center; padding: 9px;" onclick="bookFromMobile()">
+                ✅ Cerrar &amp; Asignar
+              </button>
+              <button class="ovml-btn" style="justify-content: center; padding: 9px;" onclick="copyMobileQuote()">
+                📲 Copiar Term Sheet
+              </button>
+            </div>
+            <div id="mob-toast" style="display: none; padding: 8px; border-radius: 8px; background: rgba(16, 185, 129, 0.2); border: 1px solid var(--ovml-emerald); color: #fff; font-size: 12px; text-align: center;"></div>
+          </div>
+        </div>
+
+        <!-- Right Explanation & Live Term Sheet Preview -->
+        <div class="stitch-card" style="max-width: 520px; width: 100%; padding: 16px;">
+          <h3 style="font-size: 15px; font-weight: 800; color: var(--ovml-amber-bright); margin-bottom: 6px;">
+            📄 Term Sheet Ejecutivo Coto-TradeAI (WhatsApp / Desk)
+          </h3>
+          <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">
+            Incluye Plazo, Fechas Fix y Sett, desglose en CLP, USD, pips y % de Prima sincronizados con el motor Garman-Kohlhagen &amp; Vanna-Volga.
+          </p>
+          <pre id="mob-termsheet-preview" style="background: #070a10; border: 1px solid #1e293b; border-radius: 8px; padding: 14px; font-family: var(--font-mono); font-size: 12px; color: #e2e8f0; white-space: pre-wrap; line-height: 1.55;"></pre>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ====================================================================
+       4. MODALS (STRIPS GENERATOR, BOOK DEAL TO PORTFOLIO, NEW CLIENT)
+       ==================================================================== -->
+
+  <!-- Modal 1: Generate Corporate Strips -->
+  <div class="modal-backdrop" id="modal-strips">
+    <div class="modal-card">
+      <h3 style="font-size: 15px; font-weight: 800; color: var(--ovml-amber-bright); margin-bottom: 10px;">
+        📅 Generador de Tiras Mensuales Coto-TradeAI (Strips Fix / Sett)
+      </h3>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px;">
+        <div>
+          <label style="font-size: 12px; color: var(--text-secondary);">Estructura de la Tira</label>
+          <select id="strip-type" class="matrix-select" style="max-width: none; padding: 6px;">
+            <option value="collar_export">Collar Exportador (Vende Call / Compra Put)</option>
+            <option value="collar_import">Collar Importador (Compra Call / Vende Put)</option>
+            <option value="strip_calls">Tira de Calls (Importador)</option>
+            <option value="strip_puts">Tira de Puts (Exportador)</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size: 12px; color: var(--text-secondary);">Número de Flujos Mensuales</label>
+          <select id="strip-months" class="matrix-select" style="max-width: none; padding: 6px;">
+            <option value="3">3 Meses (Trimestral)</option>
+            <option value="6" selected>6 Meses (Semestral)</option>
+            <option value="12">12 Meses (Anual)</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size: 12px; color: var(--text-secondary);">Nocional Mensual (USD)</label>
+          <input id="strip-notional" type="number" step="50000" value="500000" class="matrix-input" style="max-width: none; padding: 6px;" />
+        </div>
+        <div>
+          <label style="font-size: 12px; color: var(--text-secondary);">Strike Put Piso / Strike Call Techo</label>
+          <div style="display: flex; gap: 6px;">
+            <input id="strip-kput" type="number" value="945" class="matrix-input" style="padding: 6px;" />
+            <input id="strip-kcall" type="number" value="1020" class="matrix-input" style="padding: 6px;" />
+          </div>
+        </div>
+      </div>
+      <div style="display: flex; justify-content: flex-end; gap: 8px;">
+        <button class="ovml-btn" onclick="closeModals()">Cancelar</button>
+        <button class="ovml-btn amber" onclick="confirmGenerateStrip()">Generar Tira en Coto-TradeAI</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 2: Book Deal to Ticket Maintainer (Unassigned or Assigned to Client & Segment) -->
+  <div class="modal-backdrop" id="modal-book">
+    <div class="modal-card">
+      <h3 style="font-size: 15px; font-weight: 800; color: var(--ovml-emerald); margin-bottom: 10px;">
+        34) Guardar Ticket en Mantenedor Coto-TradeAI (Sin Asignar o con Cliente)
+      </h3>
+      <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px;">
+        <div>
+          <label style="font-size: 12px; color: var(--text-secondary); display: block; margin-bottom: 3px;">Cliente Corporativo (Opcional — Puedes dejarlo SIN ASIGNAR y asignarlo después)</label>
+          <select id="book-cp-select" class="matrix-select" style="max-width: none; padding: 7px;"></select>
+        </div>
+        <div>
+          <label style="font-size: 12px; color: var(--text-secondary); display: block; margin-bottom: 3px;">Segmento / Cartera Destino</label>
+          <select id="book-pf-select" class="matrix-select" style="max-width: none; padding: 7px;"></select>
+        </div>
+        <div>
+          <label style="font-size: 12px; color: var(--text-secondary); display: block; margin-bottom: 3px;">Nombre / Etiqueta del Ticket</label>
+          <input id="book-strat-name" type="text" value="Risk Reversal 1 (Collar Exportador)" class="matrix-input" style="max-width: none; padding: 7px;" />
+        </div>
+      </div>
+      <div style="display: flex; justify-content: flex-end; gap: 8px;">
+        <button class="ovml-btn" onclick="closeModals()">Cancelar</button>
+        <button class="ovml-btn emerald" onclick="confirmBookDeal()">Confirmar &amp; Guardar en Mantenedor de Tickets</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 3: Create New Client / Counterparty -->
+  <div class="modal-backdrop" id="modal-new-client">
+    <div class="modal-card">
+      <h3 style="font-size: 15px; font-weight: 800; color: var(--ovml-amber-bright); margin-bottom: 10px;">
+        🏢 Crear Nuevo Cliente Corporativo o Contraparte
+      </h3>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px;">
+        <div style="grid-column: span 2;">
+          <label style="font-size: 12px; color: var(--text-secondary);">Razón Social / Nombre Contraparte</label>
+          <input id="new-cp-name" type="text" placeholder="Ej: EXPORTADORA DEL SUR S.A." class="matrix-input" style="max-width: none; padding: 6px;" />
+        </div>
+        <div>
+          <label style="font-size: 12px; color: var(--text-secondary);">RUT / Identificador</label>
+          <input id="new-cp-rut" type="text" placeholder="76.543.210-K" class="matrix-input" style="max-width: none; padding: 6px;" />
+        </div>
+        <div>
+          <label style="font-size: 12px; color: var(--text-secondary);">Cartera Asignada</label>
+          <select id="new-cp-pf" class="matrix-select" style="max-width: none; padding: 6px;"></select>
+        </div>
+        <div>
+          <label style="font-size: 12px; color: var(--text-secondary);">Perfil de Flujo FX</label>
+          <select id="new-cp-profile" class="matrix-select" style="max-width: none; padding: 6px;">
+            <option value="Exportador">Exportador (Generador USD)</option>
+            <option value="Importador">Importador (Comprador USD)</option>
+            <option value="Mixto">Corporativo Mixto</option>
+            <option value="Back-to-Back">Contraparte Interbancaria</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size: 12px; color: var(--text-secondary);">Línea de Crédito Aprobada (USD)</label>
+          <input id="new-cp-line" type="number" step="500000" value="5000000" class="matrix-input" style="max-width: none; padding: 6px;" />
+        </div>
+      </div>
+      <div style="display: flex; justify-content: flex-end; gap: 8px;">
+        <button class="ovml-btn" onclick="closeModals()">Cancelar</button>
+        <button class="ovml-btn amber" onclick="confirmCreateClient()">Guardar Cliente</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 4: Create New Portfolio (Cartera) -->
+  <div class="modal-backdrop" id="modal-new-cartera">
+    <div class="modal-card">
+      <h3 style="font-size: 15px; font-weight: 800; color: var(--ovml-cyan); margin-bottom: 10px;">
+        📂 Crear Nueva Cartera de Opciones FX
+      </h3>
+      <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px;">
+        <div>
+          <label style="font-size: 12px; color: var(--text-secondary);">Nombre de la Cartera</label>
+          <input id="new-pf-name" type="text" placeholder="Ej: Cartera Minería & Energía" class="matrix-input" style="max-width: none; padding: 6px;" />
+        </div>
+        <div>
+          <label style="font-size: 12px; color: var(--text-secondary);">Sector Económico</label>
+          <input id="new-pf-sector" type="text" placeholder="Ej: Minería & Recursos Naturales" class="matrix-input" style="max-width: none; padding: 6px;" />
+        </div>
+        <div>
+          <label style="font-size: 12px; color: var(--text-secondary);">Descripción / Estrategia Típica</label>
+          <input id="new-pf-desc" type="text" placeholder="Coberturas Zero-Cost Collar y Strips de Capex" class="matrix-input" style="max-width: none; padding: 6px;" />
+        </div>
+      </div>
+      <div style="display: flex; justify-content: flex-end; gap: 8px;">
+        <button class="ovml-btn" onclick="closeModals()">Cancelar</button>
+        <button class="ovml-btn amber" onclick="confirmCreateCartera()">Crear Cartera</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Bottom Navigation Bar (Visible on Phones) -->
+  <nav class="mobile-bottom-nav">
+    <button class="mob-nav-btn" data-mob-tab="tab-mobile" onclick="switchTab('tab-mobile')">
+      <span>📱</span>
+      <span>Cotizador</span>
+    </button>
+    <button class="mob-nav-btn" data-mob-tab="tab-pricer" onclick="switchTab('tab-pricer')">
+      <span>📊</span>
+      <span>Coto-TradeAI</span>
+    </button>
+    <button class="mob-nav-btn" data-mob-tab="tab-surface" onclick="switchTab('tab-surface')">
+      <span>🌐</span>
+      <span>Vol BGN</span>
+    </button>
+    <button class="mob-nav-btn" data-mob-tab="tab-portfolio" onclick="switchTab('tab-portfolio')">
+      <span>🏢</span>
+      <span>Carteras</span>
+    </button>
+  </nav>
+
+  <script src="static/quant_edge_engine.js"></script>
+  <script src="static/app.js"></script>
+</body>
+</html>
