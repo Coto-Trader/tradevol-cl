@@ -6,7 +6,7 @@
   <title>Coto-TradeAI USD/CLP — Institutional FX Options Terminal &amp; Mobile Quoter</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="static/styles.css" />
   <link rel="stylesheet" href="/static/styles.css" />
 
@@ -16,24 +16,24 @@
     .eco-ribbon .eco-brand{color:#5b6b80;letter-spacing:.16em;text-transform:uppercase;margin-right:12px;flex:0 0 auto}
     .eco-ribbon a,.eco-ribbon .eco-cur{display:inline-flex;align-items:center;gap:4px;padding:0 13px;min-height:30px;color:#93a4bb;text-decoration:none;letter-spacing:.09em;text-transform:uppercase;border-right:1px solid #141e2b;transition:color .15s,background .15s;flex:0 0 auto}
     .eco-ribbon a:hover{color:#e6edf6;background:#0e1826}
-    .eco-ribbon .eco-cur{color:var(--ovml-amber-bright,#fbbf24);border-bottom:2px solid var(--ovml-amber,#f59e0b)}
+    .eco-ribbon .eco-cur{color:var(--ovml-amber-bright,#8CEFF6);border-bottom:2px solid var(--ovml-amber,#2FD9E8)}
     .eco-ribbon .eco-ext{font-size:9px;opacity:.65;transform:translateY(-1px)}
     .eco-ribbon .eco-spacer{flex:1 1 auto;border:0}
-    .eco-auth-chip{display:inline-flex;align-items:center;gap:7px;font-family:var(--font-mono,monospace);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#0a0f17;background:linear-gradient(180deg,#fbbf24,#f59e0b);border:0;border-radius:6px;padding:5px 12px;cursor:pointer;flex:0 0 auto;transition:filter .15s,transform .15s}
+    .eco-auth-chip{display:inline-flex;align-items:center;gap:7px;font-family:var(--font-mono,monospace);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#0a0f17;background:linear-gradient(180deg,#8CEFF6,#2FD9E8);border:0;border-radius:6px;padding:5px 12px;cursor:pointer;flex:0 0 auto;transition:filter .15s,transform .15s}
     .eco-auth-chip:hover{filter:brightness(1.08);transform:translateY(-1px)}
     .eco-auth-chip.signed{background:#0e1826;color:#cdd8e6;border:1px solid #243247}
     .eco-auth-chip .eco-av{width:18px;height:18px;border-radius:50%;object-fit:cover}
     .auth-backdrop{position:fixed;inset:0;background:rgba(3,6,11,.8);backdrop-filter:blur(5px);display:none;align-items:center;justify-content:center;z-index:12000;padding:16px}
     .auth-backdrop.open{display:flex}
-    .auth-card{position:relative;width:min(430px,94vw);background:linear-gradient(165deg,#121c2b 0%,#0a1018 100%);border:1px solid #273750;border-radius:16px;padding:30px 28px 24px;box-shadow:0 40px 110px -24px rgba(0,0,0,.85);font-family:var(--font-body,'Inter',system-ui,sans-serif);color:#e6edf6;text-align:center}
+    .auth-card{position:relative;width:min(430px,94vw);background:linear-gradient(165deg,#121c2b 0%,#0a1018 100%);border:1px solid #273750;border-radius:16px;padding:30px 28px 24px;box-shadow:0 40px 110px -24px rgba(0,0,0,.85);font-family:var(--font-sans,'IBM Plex Sans',system-ui,sans-serif);color:#e6edf6;text-align:center}
     .auth-card .auth-x{position:absolute;top:12px;right:14px;background:none;border:0;color:#64748b;font-size:20px;line-height:1;cursor:pointer}
     .auth-card .auth-x:hover{color:#e6edf6}
-    .auth-logo{display:inline-flex;align-items:center;gap:7px;font-family:var(--font-mono,monospace);font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ovml-amber-bright,#fbbf24);margin-bottom:14px}
+    .auth-logo{display:inline-flex;align-items:center;gap:7px;font-family:var(--font-mono,monospace);font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ovml-amber-bright,#8CEFF6);margin-bottom:14px}
     .auth-logo .dot{width:7px;height:7px;border-radius:50%;background:var(--ovml-emerald,#10b981);box-shadow:0 0 10px var(--ovml-emerald,#10b981)}
     .auth-card h2{font-size:21px;font-weight:800;margin:0 0 7px;color:#fff}
     .auth-card p.sub{font-size:13px;color:#93a4bb;margin:0 auto 20px;max-width:34ch;line-height:1.5}
     .gsi-wrap{display:flex;justify-content:center;min-height:44px}
-    .auth-note{font-size:11px;color:#f59e0b;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);border-radius:8px;padding:9px 12px;margin-top:4px;line-height:1.45;display:none}
+    .auth-note{font-size:11px;color:#2FD9E8;background:rgba(47,217,232,.1);border:1px solid rgba(47,217,232,.3);border-radius:8px;padding:9px 12px;margin-top:4px;line-height:1.45;display:none}
     .auth-divider{display:flex;align-items:center;gap:10px;color:#4b5a6e;font-size:10px;letter-spacing:.14em;text-transform:uppercase;margin:18px 2px 14px}
     .auth-divider::before,.auth-divider::after{content:"";flex:1;height:1px;background:#1e2a3b}
     .auth-skip{background:none;border:0;color:#93a4bb;font-size:12.5px;cursor:pointer;padding:6px}
@@ -260,7 +260,7 @@
             <div class="bqnt-hero-grid">
               <div class="premium-pv-box">
                 <div style="display: flex; justify-content: center; gap: 6px; margin-bottom: 4px;">
-                  <span class="pv-label" id="hero-unit-pill" style="background: rgba(245,158,11,0.15); color: var(--ovml-amber-bright); padding: 2px 8px; border-radius: 4px;">
+                  <span class="pv-label" id="hero-unit-pill" style="background: rgba(47,217,232,0.15); color: var(--ovml-amber-bright); padding: 2px 8px; border-radius: 4px;">
                     PRIMA NETA (CLP / USD / %)
                   </span>
                 </div>
@@ -334,7 +334,7 @@
             <div class="card-header">
               <span class="card-title">🎯 Perfil de Payoff en Fecha Fix (P&amp;L Neto CLP vs Spot al Fix)</span>
               <span style="font-size: 12px; color: var(--text-secondary);">
-                <span style="color: #38bdf8;">━ POV Cliente</span> &nbsp;|&nbsp; <span style="color: #f59e0b;">┅ POV Mesa</span>
+                <span style="color: #38bdf8;">━ POV Cliente</span> &nbsp;|&nbsp; <span style="color: #2FD9E8;">┅ POV Mesa</span>
               </span>
             </div>
             <div class="chart-box">
@@ -359,7 +359,7 @@
             </p>
           </div>
           <div style="display: flex; gap: 8px; align-items: center;">
-            <span style="padding: 4px 10px; background: rgba(245, 158, 11, 0.15); border: 1px solid var(--ovml-amber); border-radius: 5px; font-family: var(--font-mono); font-size: 12px; color: var(--ovml-amber-bright);">
+            <span style="padding: 4px 10px; background: rgba(47, 217, 232, 0.15); border: 1px solid var(--ovml-amber); border-radius: 5px; font-family: var(--font-mono); font-size: 12px; color: var(--ovml-amber-bright);">
               Spot Ref: 978.55 CLP | Format: RR/BF Bid/Ask &amp; Mid
             </span>
           </div>
@@ -421,8 +421,8 @@
       </div>
 
       <!-- 1. TOP TICKET MAINTAINER (MANTENEDOR DE TICKETS ARRIBA) -->
-      <div class="stitch-card" style="margin-bottom: 14px; border: 1px solid rgba(245, 158, 11, 0.45);">
-        <div class="card-header" style="background: linear-gradient(90deg, rgba(245,158,11,0.14) 0%, rgba(15,23,42,0.95) 100%);">
+      <div class="stitch-card" style="margin-bottom: 14px; border: 1px solid rgba(47, 217, 232, 0.45);">
+        <div class="card-header" style="background: linear-gradient(90deg, rgba(47,217,232,0.14) 0%, rgba(15,23,42,0.95) 100%);">
           <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
             <span class="card-title" style="font-size: 14px; color: var(--ovml-amber-bright);">
               🗂️ MANTENEDOR DE TICKETS Coto-TradeAI (Operaciones Sin Asignar &amp; Asignación Posterior)
