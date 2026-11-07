@@ -9,8 +9,55 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="static/styles.css" />
   <link rel="stylesheet" href="/static/styles.css" />
+
+  <!-- ====== Added (non-destructive): Ecosystem ribbon + Google auth layer ====== -->
+  <style>
+    .eco-ribbon{display:flex;align-items:center;gap:0;background:#070b12;border-bottom:1px solid #1e2a3b;font-family:var(--font-mono,'JetBrains Mono',monospace);font-size:11px;padding:0 10px;min-height:30px;overflow-x:auto;white-space:nowrap}
+    .eco-ribbon .eco-brand{color:#5b6b80;letter-spacing:.16em;text-transform:uppercase;margin-right:12px;flex:0 0 auto}
+    .eco-ribbon a,.eco-ribbon .eco-cur{display:inline-flex;align-items:center;gap:4px;padding:0 13px;min-height:30px;color:#93a4bb;text-decoration:none;letter-spacing:.09em;text-transform:uppercase;border-right:1px solid #141e2b;transition:color .15s,background .15s;flex:0 0 auto}
+    .eco-ribbon a:hover{color:#e6edf6;background:#0e1826}
+    .eco-ribbon .eco-cur{color:var(--ovml-amber-bright,#fbbf24);border-bottom:2px solid var(--ovml-amber,#f59e0b)}
+    .eco-ribbon .eco-ext{font-size:9px;opacity:.65;transform:translateY(-1px)}
+    .eco-ribbon .eco-spacer{flex:1 1 auto;border:0}
+    .eco-auth-chip{display:inline-flex;align-items:center;gap:7px;font-family:var(--font-mono,monospace);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#0a0f17;background:linear-gradient(180deg,#fbbf24,#f59e0b);border:0;border-radius:6px;padding:5px 12px;cursor:pointer;flex:0 0 auto;transition:filter .15s,transform .15s}
+    .eco-auth-chip:hover{filter:brightness(1.08);transform:translateY(-1px)}
+    .eco-auth-chip.signed{background:#0e1826;color:#cdd8e6;border:1px solid #243247}
+    .eco-auth-chip .eco-av{width:18px;height:18px;border-radius:50%;object-fit:cover}
+    .auth-backdrop{position:fixed;inset:0;background:rgba(3,6,11,.8);backdrop-filter:blur(5px);display:none;align-items:center;justify-content:center;z-index:12000;padding:16px}
+    .auth-backdrop.open{display:flex}
+    .auth-card{position:relative;width:min(430px,94vw);background:linear-gradient(165deg,#121c2b 0%,#0a1018 100%);border:1px solid #273750;border-radius:16px;padding:30px 28px 24px;box-shadow:0 40px 110px -24px rgba(0,0,0,.85);font-family:var(--font-body,'Inter',system-ui,sans-serif);color:#e6edf6;text-align:center}
+    .auth-card .auth-x{position:absolute;top:12px;right:14px;background:none;border:0;color:#64748b;font-size:20px;line-height:1;cursor:pointer}
+    .auth-card .auth-x:hover{color:#e6edf6}
+    .auth-logo{display:inline-flex;align-items:center;gap:7px;font-family:var(--font-mono,monospace);font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ovml-amber-bright,#fbbf24);margin-bottom:14px}
+    .auth-logo .dot{width:7px;height:7px;border-radius:50%;background:var(--ovml-emerald,#10b981);box-shadow:0 0 10px var(--ovml-emerald,#10b981)}
+    .auth-card h2{font-size:21px;font-weight:800;margin:0 0 7px;color:#fff}
+    .auth-card p.sub{font-size:13px;color:#93a4bb;margin:0 auto 20px;max-width:34ch;line-height:1.5}
+    .gsi-wrap{display:flex;justify-content:center;min-height:44px}
+    .auth-note{font-size:11px;color:#f59e0b;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);border-radius:8px;padding:9px 12px;margin-top:4px;line-height:1.45;display:none}
+    .auth-divider{display:flex;align-items:center;gap:10px;color:#4b5a6e;font-size:10px;letter-spacing:.14em;text-transform:uppercase;margin:18px 2px 14px}
+    .auth-divider::before,.auth-divider::after{content:"";flex:1;height:1px;background:#1e2a3b}
+    .auth-skip{background:none;border:0;color:#93a4bb;font-size:12.5px;cursor:pointer;padding:6px}
+    .auth-skip:hover{color:var(--ovml-cyan,#38bdf8)}
+    .auth-fine{font-size:10.5px;color:#4b5a6e;margin-top:14px;line-height:1.5}
+    .auth-welcome{display:none;align-items:center;gap:12px;background:#0e1826;border:1px solid #243247;border-radius:10px;padding:12px 14px;text-align:left;margin-bottom:4px}
+    .auth-welcome img{width:40px;height:40px;border-radius:50%}
+    .auth-welcome .nm{font-weight:700;font-size:14px;color:#fff}
+    .auth-welcome .em{font-size:12px;color:#93a4bb}
+    .auth-signout{margin-left:auto;background:none;border:1px solid #243247;border-radius:7px;color:#cdd8e6;font-size:11px;padding:5px 10px;cursor:pointer}
+    .auth-signout:hover{border-color:var(--ovml-crimson,#f43f5e);color:#fda4af}
+  </style>
 </head>
 <body>
+
+  <!-- ====== Added: Ecosystem ribbon (SegundaOpinión · XVA · TradeAI) ====== -->
+  <div class="eco-ribbon" role="navigation" aria-label="Ecosistema">
+    <span class="eco-brand">Ecosistema</span>
+    <a href="https://segundaopinion.cl" title="SegundaOpinión — Valoración independiente de derivados (NIIF 13)">SegundaOpinión</a>
+    <a href="https://xva.cl" title="XVA — Valoración de cartera (SegundaOpinión)">XVA</a>
+    <span class="eco-cur" aria-current="page">TradeAI</span>
+    <span class="eco-spacer"></span>
+    <button id="eco-auth-chip" class="eco-auth-chip" onclick="openAuth()">Ingresar / Registrarse</button>
+  </div>
 
   <!-- ====================================================================
        1. TOP INSTITUTIONAL TERMINAL COMMAND BAR (Coto-TradeAI)
@@ -776,7 +823,98 @@
     </button>
   </nav>
 
+  <!-- ====== Added: Google Register / Sign-up layer ====== -->
+  <div class="auth-backdrop" id="auth-modal" role="dialog" aria-modal="true" aria-label="Registro Coto-TradeAI">
+    <div class="auth-card">
+      <button class="auth-x" onclick="closeAuth()" aria-label="Cerrar">&times;</button>
+      <span class="auth-logo"><span class="dot"></span> Coto-TradeAI</span>
+
+      <!-- Signed-in view -->
+      <div class="auth-welcome" id="auth-welcome">
+        <img id="auth-welcome-av" alt="" />
+        <div>
+          <div class="nm" id="auth-welcome-nm"></div>
+          <div class="em" id="auth-welcome-em"></div>
+        </div>
+        <button class="auth-signout" onclick="signOutUser()">Salir</button>
+      </div>
+
+      <!-- Signed-out view -->
+      <div id="auth-signin">
+        <h2>Crea tu cuenta</h2>
+        <p class="sub">Accede al terminal de opciones FX USD/CLP, guarda tus carteras y sincroniza tus cotizaciones en todos tus dispositivos.</p>
+        <div class="gsi-wrap"><div id="gsi-button"></div></div>
+        <div class="auth-note" id="auth-note">Falta configurar el <b>Client ID de Google</b> (AUTH_CONFIG.GOOGLE_CLIENT_ID) para activar el acceso con Google.</div>
+        <div class="auth-divider">acceso seguro con Google</div>
+        <button class="auth-skip" onclick="closeAuth()">Explorar sin cuenta &rarr;</button>
+        <p class="auth-fine">Al continuar aceptas los Términos de Uso y la Política de Privacidad de Coto-TradeAI.</p>
+      </div>
+    </div>
+  </div>
+
   <script src="static/quant_edge_engine.js"></script>
   <script src="static/app.js"></script>
+
+  <!-- ====== Added: Google Identity Services + auth logic ====== -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script>
+  (function(){
+    // OAuth Client ID de Google (Google Cloud → Coto-TradeAI, proyecto vocal-nova-471909-q5):
+    var AUTH_CONFIG = { GOOGLE_CLIENT_ID: "480236440496-t4abcaag4kniob3sekktg0p9v3ocq88g.apps.googleusercontent.com" };
+    var LS_KEY = "cototradeai_user";
+
+    function b64urlDecode(s){ s=s.replace(/-/g,'+').replace(/_/g,'/'); try{ return decodeURIComponent(escape(atob(s))); }catch(e){ try{return atob(s);}catch(_){return "";} } }
+    function parseJwt(t){ try{ return JSON.parse(b64urlDecode(String(t).split('.')[1])); }catch(e){ return null; } }
+    function getUser(){ try{ return JSON.parse(localStorage.getItem(LS_KEY)||"null"); }catch(e){ return null; } }
+    function setUser(u){ try{ localStorage.setItem(LS_KEY, JSON.stringify(u)); }catch(e){} }
+    function clearUser(){ try{ localStorage.removeItem(LS_KEY); }catch(e){} }
+    function esc(s){ return String(s||'').replace(/[&<>"']/g,function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]; }); }
+
+    window.handleGoogleCredential = function(resp){
+      var p = parseJwt(resp && resp.credential);
+      if(!p) return;
+      setUser({ name:p.name||p.given_name||"Usuario", email:p.email||"", picture:p.picture||"", sub:p.sub, ts:Date.now() });
+      renderAuthState();
+      setTimeout(closeAuth, 700);
+    };
+    window.openAuth = function(){ var m=document.getElementById('auth-modal'); if(m) m.classList.add('open'); renderAuthState(); };
+    window.closeAuth = function(){ var m=document.getElementById('auth-modal'); if(m) m.classList.remove('open'); try{ sessionStorage.setItem('cototradeai_seen','1'); }catch(e){} };
+    window.signOutUser = function(){ clearUser(); if(window.google&&google.accounts&&google.accounts.id){ try{ google.accounts.id.disableAutoSelect(); }catch(e){} } renderAuthState(); };
+
+    function renderAuthState(){
+      var u=getUser();
+      var chip=document.getElementById('eco-auth-chip');
+      var welcome=document.getElementById('auth-welcome');
+      var signin=document.getElementById('auth-signin');
+      if(u){
+        if(chip){ chip.classList.add('signed'); chip.innerHTML=(u.picture?'<img class="eco-av" src="'+esc(u.picture)+'" alt="">':'')+'<span>'+esc((u.name||'Cuenta').split(' ')[0])+'</span>'; }
+        if(welcome){ welcome.style.display='flex'; var av=document.getElementById('auth-welcome-av'); if(av){ if(u.picture){av.src=u.picture;av.style.display='';}else{av.style.display='none';} } var nm=document.getElementById('auth-welcome-nm'); if(nm) nm.textContent=u.name||''; var em=document.getElementById('auth-welcome-em'); if(em) em.textContent=u.email||''; }
+        if(signin) signin.style.display='none';
+      } else {
+        if(chip){ chip.classList.remove('signed'); chip.textContent='Ingresar / Registrarse'; }
+        if(welcome) welcome.style.display='none';
+        if(signin) signin.style.display='block';
+      }
+    }
+
+    function initGoogle(){
+      if(!(window.google&&google.accounts&&google.accounts.id)) return false;
+      if(!AUTH_CONFIG.GOOGLE_CLIENT_ID){ var n=document.getElementById('auth-note'); if(n) n.style.display='block'; return true; }
+      try{
+        google.accounts.id.initialize({ client_id:AUTH_CONFIG.GOOGLE_CLIENT_ID, callback:window.handleGoogleCredential, auto_select:false, cancel_on_tap_outside:true });
+        var holder=document.getElementById('gsi-button');
+        if(holder) google.accounts.id.renderButton(holder,{ theme:'filled_black', size:'large', shape:'pill', text:'continue_with', logo_alignment:'center', width:300 });
+      }catch(e){}
+      return true;
+    }
+
+    var tries=0, iv=setInterval(function(){ tries++; if(initGoogle()||tries>50) clearInterval(iv); },150);
+
+    document.addEventListener('DOMContentLoaded', function(){
+      renderAuthState();
+      if(!getUser()){ var seen=false; try{ seen=!!sessionStorage.getItem('cototradeai_seen'); }catch(e){} if(!seen) setTimeout(openAuth, 900); }
+    });
+  })();
+  </script>
 </body>
 </html>
